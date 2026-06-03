@@ -3,7 +3,6 @@ package com.zchat.accessibility
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityNodeInfo
 import com.zchat.accessibility.platform.InstagramParser
 import com.zchat.accessibility.platform.TelegramParser
 import com.zchat.accessibility.platform.TikTokParser
@@ -86,13 +85,12 @@ class ZChatAccessibilityService : AccessibilityService() {
 
     fun getChatData(): ParsedChatData? {
         val parser = platformParsers[currentPackage] ?: return null
-        // Эмулятсияи ҳодиса барои гирифтани маълумот
         val rootNode = rootInActiveWindow ?: return null
         try {
             val event = AccessibilityEvent.obtain(
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
             )
-            event.packageName = currentPackage.let { android.content.ComponentName.unflattenFromString(it)?.packageName?.let { pkg -> android.content.ComponentName.unflattenFromString(it)?.packageName } ?: return@let currentPackage }
+            event.packageName = currentPackage
             return parser.parse(event)
         } finally {
             rootNode.recycle()

@@ -52,6 +52,6 @@ data class ContactDto(
 )
 
 data class ChatListDto(
-    val chats: List<ChatDto> = emptyList(),
+    val results: List<ChatDto> = emptyList(),
     val count: Int = 0
 )

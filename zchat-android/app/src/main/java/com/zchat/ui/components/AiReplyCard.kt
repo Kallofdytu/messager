@@ -6,6 +6,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -164,12 +165,3 @@ fun AiReplyCard(
     }
 }
 
-@Composable
-private fun Box(modifier: Modifier) {
-    androidx.compose.foundation.layout.Box(modifier = modifier)
-}
-
-@Composable
-private fun Box(modifier: Modifier, content: @Composable () -> Unit) {
-    androidx.compose.foundation.layout.Box(modifier = modifier, content = content)
-}

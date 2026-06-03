@@ -30,7 +30,7 @@ class ChatRepository @Inject constructor(
         return try {
             val response = chatApi.getChats()
             if (response.isSuccessful) {
-                val chatDtos = response.body()?.chats ?: emptyList()
+                val chatDtos = response.body()?.results ?: emptyList()
                 val entities = chatDtos.map { it.toEntity() }
                 chatDao.insertAll(entities)
                 Result.success(Unit)
@@ -52,9 +52,9 @@ class ChatRepository @Inject constructor(
         return messageDao.getMessagesByChatId(chatId)
     }
 
-    suspend fun fetchAndSaveMessages(chatId: Long, platformChatId: String): Result<Unit> {
+    suspend fun fetchAndSaveMessages(chatId: Long): Result<Unit> {
         return try {
-            val response = chatApi.getMessages(platformChatId)
+            val response = chatApi.getMessages()
             if (response.isSuccessful) {
                 val messageDtos = response.body() ?: emptyList()
                 val entities = messageDtos.map { it.toEntity(chatId) }

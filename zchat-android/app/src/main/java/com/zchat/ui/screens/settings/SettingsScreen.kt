@@ -35,6 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
+    onNavigateBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
@@ -45,7 +46,7 @@ fun SettingsScreen(
             TopAppBar(
                 title = { Text("Танзимот") },
                 navigationIcon = {
-                    IconButton(onClick = { /* navController.popBackStack() */ }) {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Бозгашт"

@@ -1,8 +1,6 @@
 package com.zchat.ui.screens.chat
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -46,7 +44,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -70,16 +67,10 @@ fun ChatScreen(
     viewModel: ChatViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     val gradient = platformGradients[chatId] ?: listOf(Color(0xFF6C5CE7), Color(0xFF4834D4))
     var showReply by remember { mutableStateOf(false) }
     var replyAnim by remember { mutableStateOf(0f) }
-
-    val brandColor by animateColorAsState(
-        targetValue = gradient.first(),
-        animationSpec = tween(1000)
-    )
 
     LaunchedEffect(chatId) {
         viewModel.initialize(chatId)

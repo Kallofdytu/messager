@@ -22,14 +22,11 @@ interface ChatApi {
     @POST("chats/")
     suspend fun createChat(@Body chat: ChatDto): Response<ChatDto>
 
-    @GET("chats/{id}/messages/")
-    suspend fun getMessages(@Path("id") chatId: String): Response<List<MessageDto>>
+    @GET("messages/")
+    suspend fun getMessages(): Response<List<MessageDto>>
 
-    @POST("chats/{id}/messages/")
-    suspend fun sendMessage(
-        @Path("id") chatId: String,
-        @Body message: MessageDto
-    ): Response<MessageDto>
+    @POST("messages/")
+    suspend fun sendMessage(@Body message: MessageDto): Response<MessageDto>
 
     @GET("contacts/")
     suspend fun getContacts(): Response<List<ContactDto>>
