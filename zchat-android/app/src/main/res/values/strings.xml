@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ZChat</string>
+    <!-- Танзимот -->
+    <string name="settings">Танзимот</string>
+    <string name="language">Забон</string>
+    <string name="logout">Баромад</string>
+    <!-- Авторизатсия -->
+    <string name="login">Ворид шудан</string>
+    <string name="register">Сабти ном</string>
+    <string name="username">Номи корбарӣ</string>
+    <string name="password">Парол</string>
+    <!-- Платформаҳо -->
+    <string name="whatsapp">WhatsApp</string>
+    <string name="instagram">Instagram</string>
+    <string name="telegram">Telegram</string>
+    <string name="viber">Viber</string>
+    <string name="tiktok">TikTok</string>
+    <!-- AI -->
+    <string name="ai_suggest">ZChat пешниҳод мекунад</string>
+    <string name="apply">Истифода бурдан</string>
+    <string name="edit">Таҳрир кардан</string>
+</resources>

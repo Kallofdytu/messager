@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Асосӣ{% endblock %}
+{% block content %}
+<div class="greeting-wrap animate" style="padding-top:24px">
+    <div class="hi">Салом, {{ user.username }} 👋</div>
+    <div class="sub">Платформаеро интихоб кунед</div>
+</div>
+
+<div class="platform-grid" style="display:flex;flex-direction:column;gap:12px;padding:8px 16px">
+    <a href="{% url 'chat_page' %}?platform=whatsapp" class="platform-card">
+        <div class="p-icon" style="background:#25D366">💬</div>
+        <div class="p-info">
+            <div class="p-name">WhatsApp</div>
+            <div class="p-desc">Паёмҳо ва мукотибаҳо</div>
+        </div>
+        <span class="p-arrow">→</span>
+    </a>
+
+    <a href="{% url 'chat_page' %}?platform=instagram" class="platform-card">
+        <div class="p-icon" style="background:linear-gradient(135deg,#833AB4,#FD1D1D)">📸</div>
+        <div class="p-info">
+            <div class="p-name">Instagram</div>
+            <div class="p-desc">Direct Messages</div>
+        </div>
+        <span class="p-arrow">→</span>
+    </a>
+
+    <a href="{% url 'chat_page' %}?platform=telegram" class="platform-card">
+        <div class="p-icon" style="background:#0088cc">✈️</div>
+        <div class="p-info">
+            <div class="p-name">Telegram</div>
+            <div class="p-desc">Мукотибаҳо ва каналҳо</div>
+        </div>
+        <span class="p-arrow">→</span>
+    </a>
+
+    <a href="{% url 'chat_page' %}?platform=viber" class="platform-card">
+        <div class="p-icon" style="background:#665CAC">📞</div>
+        <div class="p-info">
+            <div class="p-name">Viber</div>
+            <div class="p-desc">Паёмҳо ва зангҳо</div>
+        </div>
+        <span class="p-arrow">→</span>
+    </a>
+
+    <a href="{% url 'chat_page' %}?platform=tiktok" class="platform-card">
+        <div class="p-icon" style="background:#000">🎵</div>
+        <div class="p-info">
+            <div class="p-name">TikTok</div>
+            <div class="p-desc">Паёмҳои мустақим</div>
+        </div>
+        <span class="p-arrow">→</span>
+    </a>
+</div>
+
+<div class="card animate" style="margin:16px">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center">
+        <div>
+            <div style="font-size:22px;font-weight:700;color:var(--primary)">0</div>
+            <div style="font-size:11px;color:var(--text3)">Имрӯз</div>
+        </div>
+        <div>
+            <div style="font-size:22px;font-weight:700;color:var(--gradient-2)">0</div>
+            <div style="font-size:11px;color:var(--text3)">Ҳафта</div>
+        </div>
+        <div>
+            <div style="font-size:22px;font-weight:700;color:var(--text2)">0</div>
+            <div style="font-size:11px;color:var(--text3)">Ҷамъ</div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .platform-card {
+        display:flex;
+        align-items:center;
+        gap:14px;
+        padding:16px;
+        background:rgba(255,255,255,.95);
+        backdrop-filter:blur(12px);
+        -webkit-backdrop-filter:blur(12px);
+        border-radius:16px;
+        box-shadow:0 2px 12px rgba(0,0,0,.06);
+        text-decoration:none;
+        color:var(--text);
+        transition:all .25s,transform .2s;
+        border:1.5px solid transparent;
+    }
+    .platform-card:hover {
+        transform:translateY(-2px);
+        box-shadow:0 8px 24px rgba(108,92,231,.15);
+        border-color:var(--primary-light);
+    }
+    .platform-card:active { transform:scale(0.97); }
+    .platform-card .p-icon {
+        width:48px;
+        height:48px;
+        border-radius:14px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:22px;
+        flex-shrink:0;
+        box-shadow:0 4px 12px rgba(0,0,0,.1);
+    }
+    .platform-card .p-info { flex:1; min-width:0; }
+    .platform-card .p-info .p-name { font-size:16px;font-weight:600; }
+    .platform-card .p-info .p-desc { font-size:13px;color:var(--text3);margin-top:2px; }
+    .platform-card .p-arrow { font-size:18px;color:var(--text3);flex-shrink:0; }
+</style>
+{% endblock %}

@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% block title %}{{ platform_name }}{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+{% with p=platform %}
+<style>
+    :root {
+        --p-header: {{ theme.header }};
+        --p-header2: {{ theme.header2|default:theme.header }};
+        --p-bg: {{ theme.bg }};
+        --p-bubble-mine: {{ theme.bubble_mine }};
+        --p-bubble-theirs: {{ theme.bubble_theirs }};
+        --p-text-mine: {{ theme.text_mine }};
+        --p-text-theirs: {{ theme.text_theirs }};
+        --p-accent: {{ theme.accent }};
+        --p-input-bg: {{ theme.input_bg }};
+        --p-tab-bg: {{ theme.tab_bg }};
+        --p-chat-bg: {{ theme.chat_bg }};
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    .ch-wrap { background:var(--p-bg); min-height:100vh; display:flex; flex-direction:column; position:relative; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+
+    /* ─═══ Header ═══─ */
+    .ch-hdr {
+        background:linear-gradient(135deg,var(--p-header),var(--p-header2));
+        padding:12px 16px; display:flex; align-items:center; gap:10px;
+        position:sticky; top:0; z-index:20; box-shadow:0 2px 8px rgba(0,0,0,.12);
+    }
+    .ch-hdr .back { color:#fff; text-decoration:none; font-size:20px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all .2s; flex-shrink:0; }
+    .ch-hdr .back:hover { background:rgba(255,255,255,.15); }
+    .ch-hdr .h-icon { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+    .ch-hdr .h-info { flex:1; min-width:0; }
+    .ch-hdr .h-info .h-title { font-size:16px; font-weight:600; color:#fff; }
+    .ch-hdr .h-info .h-sub { font-size:11px; color:rgba(255,255,255,.7); }
+    .ch-hdr .ai-trigger {
+        width:36px; height:36px; border-radius:50%; border:none; cursor:pointer;
+        display:flex; align-items:center; justify-content:center; font-size:16px;
+        background:rgba(255,255,255,.2); color:#fff; position:relative;
+        transition:all .25s; flex-shrink:0;
+    }
+    .ch-hdr .ai-trigger:hover { background:rgba(255,255,255,.35); transform:scale(1.08); }
+    .ch-hdr .ai-trigger .dot {
+        position:absolute; top:-1px; right:-1px; width:9px; height:9px; border-radius:50%;
+        border:2px solid var(--p-header); transition:all .3s;
+    }
+    .ch-hdr .ai-trigger .dot.on { background:#22c55e; animation:pulse-dot 2s ease-in-out infinite; }
+    .ch-hdr .ai-trigger .dot.off { background:#a0a0b0; }
+
+    /* ─═══ Chat List ═══─ */
+    .ch-list { flex:1; overflow-y:auto; }
+    .ch-item {
+        display:flex; align-items:center; gap:12px; padding:14px 16px;
+        cursor:pointer; transition:all .15s; text-decoration:none; color:inherit;
+        border-bottom:1px solid rgba(0,0,0,.05);
+    }
+    .ch-item:hover { background:var(--p-tab-bg); }
+    .ch-item:active { background:var(--p-tab-bg); opacity:.8; }
+    .ch-item .av {
+        width:50px; height:50px; border-radius:50%; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        font-weight:700; font-size:17px; color:#fff; position:relative;
+    }
+    .ch-item .av .onl {
+        position:absolute; bottom:1px; right:1px; width:12px; height:12px;
+        border-radius:50%; background:#22c55e; border:2px solid var(--p-bg);
+    }
+    .ch-item .inf { flex:1; min-width:0; }
+    .ch-item .inf .nm { font-size:15px; font-weight:500; color:var(--p-text-theirs); }
+    .ch-item .inf .pr {
+        font-size:13px; margin-top:2px; white-space:nowrap; overflow:hidden;
+        text-overflow:ellipsis; color:var(--p-accent); opacity:.7;
+    }
+    .ch-item .tm { font-size:11px; color:var(--p-accent); opacity:.5; flex-shrink:0; }
+
+    /* ─═══ Conversation ═══─ */
+    .ch-conv { flex:1; overflow-y:auto; padding:12px 16px; display:flex; flex-direction:column; gap:3px; background:var(--p-chat-bg); }
+    .msg { display:flex; align-items:flex-end; gap:6px; }
+    .msg.mine { justify-content:flex-end; }
+    .msg .bub {
+        max-width:75%; padding:8px 14px; font-size:14px; line-height:1.5;
+        border-radius:18px; word-wrap:break-word;
+    }
+    .msg.mine .bub { background:var(--p-bubble-mine); color:var(--p-text-mine); border-bottom-right-radius:4px; }
+    .msg.theirs .bub { background:var(--p-bubble-theirs); color:var(--p-text-theirs); border-bottom-left-radius:4px; }
+    .msg .bub .mt { font-size:10px; opacity:.6; text-align:right; margin-top:3px; }
+    .ch-top { display:flex; align-items:center; gap:8px; padding:4px 0 12px; }
+    .ch-top .tag { font-size:11px; padding:3px 10px; border-radius:99px; background:var(--p-tab-bg); color:var(--p-accent); font-weight:500; }
+
+    /* ─═══ AI Reply Bar ═══─ */
+    .ch-bar {
+        padding:10px 16px; background:var(--p-input-bg);
+        border-top:1px solid rgba(0,0,0,.06); flex-shrink:0;
+    }
+    .ch-bar .sug {
+        background:var(--p-bubble-theirs); border-radius:18px; padding:12px 16px;
+        margin-bottom:8px; font-size:14px; line-height:1.5; color:var(--p-text-theirs);
+        box-shadow:0 1px 4px rgba(0,0,0,.06);
+    }
+    .ch-bar .sug .lb { font-size:11px; font-weight:600; color:var(--p-accent); margin-bottom:5px; display:flex; align-items:center; gap:4px; }
+    .ch-bar .acts { display:flex; gap:8px; }
+    .ch-bar .acts button {
+        flex:1; padding:9px; border:none; border-radius:12px; font-size:13px; font-weight:600;
+        cursor:pointer; transition:all .2s;
+    }
+    .ch-bar .acts button:active { transform:scale(.95); }
+    .ch-bar .acts .u { background:var(--p-header); color:#fff; }
+    .ch-bar .acts .u:hover { opacity:.9; }
+    .ch-bar .acts .e { background:rgba(0,0,0,.06); color:var(--p-text-theirs); }
+    .ch-bar .acts .e:hover { background:rgba(0,0,0,.1); }
+
+    /* ─═══ Redirect overlay ═══─ */
+    .redirect-overlay {
+        display:none; position:fixed; inset:0; z-index:100;
+        background:rgba(0,0,0,.8); backdrop-filter:blur(20px);
+        align-items:center; justify-content:center; flex-direction:column;
+    }
+    .redirect-overlay.show { display:flex; }
+    .redirect-overlay .box {
+        background:var(--p-bg); border-radius:24px; padding:32px;
+        text-align:center; max-width:320px; width:90%;
+        animation:fadeIn .3s ease;
+    }
+    .redirect-overlay .box .big-icon { font-size:56px; margin-bottom:12px; }
+    .redirect-overlay .box h2 { font-size:20px; font-weight:700; color:var(--p-text-theirs); margin-bottom:4px; }
+    .redirect-overlay .box p { font-size:14px; color:var(--p-accent); opacity:.7; margin-bottom:16px; }
+    .redirect-overlay .box .btn-done { width:100%; padding:13px; border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; background:var(--p-header); color:#fff; transition:all .2s; }
+    .redirect-overlay .box .btn-done:hover { opacity:.9; }
+
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.5} }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+</style>
+
+<div class="ch-wrap">
+    <div class="ch-hdr">
+        <a href="{% url 'home' %}" class="back">←</a>
+        <div class="h-icon" style="background:rgba(255,255,255,.2)">{{ platform_name|first }}</div>
+        <div class="h-info">
+            <div class="h-title">{{ platform_name }}</div>
+            <div class="h-sub" id="hdrSub">{{ chats|length }} мукотиба</div>
+        </div>
+        <button class="ai-trigger" id="aiBtn" onclick="toggleAI()">
+            🤖 <span class="dot on" id="aiDot"></span>
+        </button>
+    </div>
+
+    <!-- Chat list -->
+    <div class="ch-list" id="chatList">
+        {% for chat in chats %}
+        <div class="ch-item" onclick="openChat({{ forloop.counter0 }})">
+            <div class="av" style="background:{{ chat.color }}">
+                {{ chat.initials }}
+                {% if chat.online %}<div class="onl"></div>{% endif %}
+            </div>
+            <div class="inf">
+                <div class="nm">{{ chat.name }}</div>
+                <div class="pr">{{ chat.last_msg }}</div>
+            </div>
+            <div class="tm">{{ chat.time }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Conversation views (hidden) -->
+    {% for chat in chats %}
+    <div class="ch-conv" id="conv_{{ forloop.counter0 }}" style="display:none">
+        <div class="ch-top">
+            <span style="font-weight:600;font-size:15px">👤 {{ chat.name }}</span>
+            <span class="tag">{{ platform_name }}</span>
+        </div>
+        {% for msg in chat.messages %}
+        <div class="msg {{ msg.side }}">
+            <div class="bub">{{ msg.text }}<div class="mt">{{ msg.time }}</div></div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    <!-- AI Reply -->
+    <div class="ch-bar">
+        <div class="sug" id="aiSug">
+            <div class="lb">🤖 ZChat AI</div>
+            <span id="sugTxt">Чат интихоб кунед...</span>
+        </div>
+        <div class="acts">
+            <button class="e" onclick="editAI()">✏️ Таҳрир</button>
+            <button class="u" id="useBtn" onclick="useAI()">📤 Ҷавоб додан</button>
+        </div>
+    </div>
+</div>
+
+<!-- Redirect overlay -->
+<div class="redirect-overlay" id="redirectOverlay">
+    <div class="box">
+        <div class="big-icon">📲</div>
+        <h2>Боз кардани {{ platform_name }}...</h2>
+        <p id="redirectInfo">Ҷавоб барои Шахс</p>
+        <div style="margin:16px 0;font-size:13px;color:var(--p-accent);opacity:.6" id="aiThinking">🤔 AI ҷавобро тайёр мекунад...</div>
+        <textarea id="finalReply" style="width:100%;min-height:70px;padding:10px;border:2px solid rgba(0,0,0,.1);border-radius:12px;font-size:14px;font-family:inherit;resize:vertical;margin-bottom:12px;display:none"></textarea>
+        <button class="btn-done" id="doneBtn" onclick="closeRedirect()">✅ Идома додан</button>
+    </div>
+</div>
+
+<script>
+    const chats = {{ chats_json|safe }};
+    let currentChat = -1;
+    let aiOn = true;
+
+    function toggleAI() {
+        aiOn = !aiOn;
+        document.getElementById('aiBtn').classList.toggle('active', aiOn);
+        document.getElementById('aiDot').className = 'dot ' + (aiOn ? 'on' : 'off');
+        document.getElementById('hdrSub').textContent = aiOn ? '🤖 AI кор мекунад' : 'AI қатъ';
+    }
+
+    function openChat(idx) {
+        currentChat = idx;
+        document.querySelectorAll('.ch-list, [id^=conv_]').forEach(e => e.style.display = 'none');
+        document.getElementById('conv_' + idx).style.display = 'flex';
+        document.getElementById('hdrSub').textContent = chats[idx].name;
+        document.getElementById('sugTxt').textContent = '🧠 ' + chats[idx].ai_suggestion;
+    }
+
+    function useAI() {
+        if (currentChat < 0) { alert('Чат интихоб кунед!'); return; }
+        const chat = chats[currentChat];
+        document.getElementById('redirectInfo').textContent = 'Ҷавоб барои ' + chat.name;
+        document.getElementById('redirectOverlay').classList.add('show');
+
+        const finalText = document.getElementById('finalReply');
+        const thinking = document.getElementById('aiThinking');
+        const doneBtn = document.getElementById('doneBtn');
+        finalText.style.display = 'none';
+        doneBtn.textContent = '📲 Интизор шавед...';
+
+        let dots = 0;
+        const interval = setInterval(() => {
+            dots = (dots + 1) % 4;
+            thinking.textContent = '🤔 AI таҳлил мекунад' + '.'.repeat(dots);
+        }, 400);
+
+        setTimeout(() => {
+            clearInterval(interval);
+            thinking.textContent = '✅ AI ҷавобро тайёр кард!';
+            finalText.value = chat.ai_suggestion;
+            finalText.style.display = 'block';
+            doneBtn.textContent = '📋 Нусха бардорӣ ва боз кардан';
+        }, 2000);
+    }
+
+    document.getElementById('doneBtn').addEventListener('click', function() {
+        if (this.textContent.includes('Нусха')) {
+            const text = document.getElementById('finalReply').value;
+            navigator.clipboard.writeText(text).then(() => {
+                this.textContent = '✅ Нусха бардошта шуд!';
+                setTimeout(() => {
+                    document.getElementById('redirectOverlay').classList.remove('show');
+                }, 1000);
+            });
+        }
+    });
+
+    function closeRedirect() {
+        document.getElementById('redirectOverlay').classList.remove('show');
+    }
+
+    function editAI() {
+        const sug = document.getElementById('sugTxt');
+        const reply = document.getElementById('finalReply');
+        reply.value = sug.textContent.replace(/^[🧠*]\s*/, '');
+        document.getElementById('redirectOverlay').classList.add('show');
+        document.getElementById('redirectInfo').textContent = 'Таҳрири ҷавоб';
+        document.getElementById('aiThinking').textContent = '✏️ Матнро тағйир диҳед';
+        reply.style.display = 'block';
+        document.getElementById('doneBtn').textContent = '✅ Тайёр';
+    }
+
+    if (chats.length > 0) openChat(0);
+</script>
+{% endwith %}
+{% endblock %}
+{% block aibar %}{% endblock %}

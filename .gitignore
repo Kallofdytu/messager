@@ -1,0 +1,49 @@
+# ─═══ Python / Django ═══─
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+*.sqlite3
+*.sqlite
+staticfiles/
+media/
+*.mo
+*.pot
+
+# ─═══ Environment ═══─
+.env
+.env.local
+.env.production
+
+# ─═══ Node / Vite ═══─
+node_modules/
+dist/
+*.tsbuildinfo
+*.local
+
+# ─═══ Android / Kotlin ═══─
+zchat-android/.gradle/
+zchat-android/build/
+zchat-android/app/build/
+zchat-android/local.properties
+zchat-android/.idea/
+*.iml
+*.apk
+*.aab
+*.keystore
+*.jks
+local.properties
+
+# ─═══ IDE ═══─
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

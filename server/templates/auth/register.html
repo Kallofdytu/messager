@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Сабти ном{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+    <div class="auth-card animate">
+        <div class="logo-wrap">
+            <div class="z-logo">Z</div>
+        </div>
+        <h1>Эҷоди ҳисоб</h1>
+        <p class="subtitle">Ба ZChat ҳамроҳ шавед</p>
+
+        {% if messages %}
+        <div class="messages" style="margin:0 0 16px">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Номи корбарӣ</label>
+                <input type="text" name="username" placeholder="username" required>
+            </div>
+            <div class="form-group">
+                <label>Почтаи электронӣ</label>
+                <input type="email" name="email" placeholder="email@example.com">
+            </div>
+            <div class="form-group">
+                <label>Телефон</label>
+                <input type="tel" name="phone" placeholder="+992900000000">
+            </div>
+            <div class="form-group">
+                <label>Парол</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+            <div class="form-group">
+                <label>Забон</label>
+                <select name="language">
+                    <option value="tg">Тоҷикӣ</option>
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Сабти ном</button>
+        </form>
+
+        <div class="auth-link">
+            Аллакай ҳисоб доред? <a href="{% url 'login' %}">Ворид шудан</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

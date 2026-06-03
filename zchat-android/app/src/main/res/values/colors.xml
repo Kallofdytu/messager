@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="zchat_primary">#1A237E</color>
+    <color name="zchat_secondary">#FFD600</color>
+    <color name="zchat_background">#F5F5F5</color>
+    <color name="zchat_surface">#FFFFFF</color>
+    <color name="zchat_on_primary">#FFFFFF</color>
+    <color name="zchat_on_background">#212121</color>
+    <color name="black">#FF000000</color>
+</resources>

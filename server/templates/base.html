@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="{{ language|default:'tg' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZChat — {% block title %}Асистенти AI{% endblock %}</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5a4bd1;
+            --primary-light: rgba(108,92,231,.12);
+            --gradient-1: #6c5ce7;
+            --gradient-2: #764ba2;
+            --surface: #ffffff;
+            --surface2: #f0f2f8;
+            --surface3: #e8e8f0;
+            --border: #e0e0e8;
+            --text: #1a1a2e;
+            --text2: #6b6b80;
+            --text3: #a0a0b0;
+            --green: #22c55e;
+            --red: #ef4444;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,.12);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background: var(--surface2);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        /* ─═══ Header ═══─ */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 1px 8px rgba(0,0,0,.06);
+            flex-shrink: 0;
+            z-index: 10;
+            position: sticky;
+            top: 0;
+        }
+        .header .z-badge {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg,var(--gradient-1),var(--gradient-2));
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .header h1 { font-size: 16px; font-weight: 700; color: var(--text); flex: 1; }
+        .header .back-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 22px;
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all .2s;
+            text-decoration: none;
+        }
+        .header .back-btn:hover { background: var(--primary-light); }
+        .header .icon-btn {
+            background: #f5f5fa;
+            border: none;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all .2s;
+            text-decoration: none;
+            color: var(--text2);
+        }
+        .header .icon-btn:hover { background: #ede9ff; transform: scale(1.1); }
+        /* ─═══ Content ═══─ */
+        .content { flex: 1; overflow-y: auto; }
+        /* ─═══ Chat List ═══─ */
+        .chat-list { padding: 8px 0; }
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all .25s, transform .2s;
+            text-decoration: none;
+            color: inherit;
+        }
+        .chat-item:hover { background: #f5f3ff; transform: translateX(4px); box-shadow: 0 2px 12px rgba(108,92,231,.1); }
+        .chat-item:active { transform: scale(0.97); }
+        .chat-item .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: #fff;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .chat-item .avatar .online-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: var(--green);
+            border: 2px solid #fff;
+        }
+        .chat-item .info { flex: 1; min-width: 0; }
+        .chat-item .info .name { font-size: 15px; font-weight: 600; color: var(--text); }
+        .chat-item .info .preview {
+            font-size: 13px;
+            color: var(--text3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        .chat-item .info .time { font-size: 11px; color: var(--text3); text-align: right; flex-shrink: 0; }
+        /* ─═══ Platform badge ═══─ */
+        .platform-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 99px;
+            background: var(--surface3);
+            color: var(--text2);
+            margin-top: 2px;
+        }
+        /* ─═══ AI Toggle ═══─ */
+        .ai-toggle-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: rgba(255,255,255,.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+            position: sticky;
+            bottom: 0;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            background: #e0e0e8;
+            border-radius: 99px;
+            cursor: pointer;
+            transition: all .25s;
+            flex-shrink: 0;
+            border: none;
+            padding: 0;
+        }
+        .toggle-switch.active { background: var(--primary); }
+        .toggle-switch .knob {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,.15);
+            transition: all .25s;
+        }
+        .toggle-switch.active .knob { left: 25px; }
+        .ai-status {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .ai-status .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .ai-status .status-dot.on { background: var(--green); box-shadow: 0 0 8px rgba(34,197,94,.5); animation: pulse-dot 2s ease-in-out infinite; }
+        .ai-status .status-dot.off { background: var(--text3); }
+        .ai-status .status-text.on { color: var(--green); }
+        .ai-status .status-text.off { color: var(--text3); }
+        /* ─═══ Cards ═══─ */
+        .card {
+            background: rgba(255,255,255,.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            margin: 16px;
+        }
+        /* ─═══ Buttons ═══─ */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .25s, transform .15s;
+            text-decoration: none;
+        }
+        .btn:active { transform: scale(0.95) !important; }
+        .btn-primary { background: linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); color: #fff; }
+        .btn-primary:hover { box-shadow: 0 8px 24px rgba(108,92,231,.35); transform: translateY(-1px); }
+        .btn-secondary { background: var(--primary-light); color: var(--primary); }
+        .btn-secondary:hover { background: #ede9ff; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-danger { background: var(--red); color: #fff; }
+        .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; }
+        /* ─═══ Form ═══─ */
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text2);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 13px 16px;
+            border: 2px solid #e4e4e8;
+            border-radius: 12px;
+            font-size: 15px;
+            background: #fafafa;
+            transition: all .25s;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108,92,231,.15);
+        }
+        /* ─═══ AI Suggestion ═══─ */
+        .ai-card {
+            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin: 16px;
+        }
+        .ai-card .label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .ai-card .reply-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text);
+            padding: 12px;
+            background: #fff;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        .ai-card .actions { display: flex; gap: 10px; }
+        /* ─═══ Messages ═══─ */
+        .messages { margin: 16px; }
+        .message {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .message.error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; }
+        .message.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
+        /* ─═══ Auth screens ═══─ */
+        .auth-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #6c5ce7);
+            background-size: 400% 400%;
+            animation: bgShift 15s ease infinite;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 380px;
+            background: rgba(255,255,255,.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 40px 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.3);
+            border: 1px solid rgba(255,255,255,.1);
+        }
+        .auth-card .logo-wrap {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .auth-card .logo-wrap .z-logo {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg,var(--gradient-1),var(--gradient-2));
+            color: #fff;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 24px;
+            box-shadow: 0 8px 24px rgba(108,92,231,.3);
+        }
+        .auth-card h1 { font-size: 22px;font-weight:700;color:var(--text);text-align:center; }
+        .auth-card .subtitle { font-size:14px;color:var(--text2);text-align:center;margin-bottom:24px; }
+        .auth-link { font-size:14px;color:var(--text2);text-align:center;margin-top:20px; }
+        .auth-link a { color:var(--primary);font-weight:600;text-decoration:none; }
+        /* ─═══ Greeting ═══─ */
+        .greeting-wrap { padding: 16px 16px 4px; }
+        .greeting-wrap .hi { font-size: 22px; font-weight: 700; color: var(--text); }
+        .greeting-wrap .sub { font-size: 14px; color: var(--text2); margin-top: 2px; }
+        /* ─═══ Settings ═══─ */
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--surface3);
+        }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-item .label { font-size: 15px; font-weight: 500; color: var(--text); }
+        .settings-item .value { font-size: 14px; color: var(--text2); }
+        /* ─═══ Empty state ═══─ */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+        .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+        .empty-state p { font-size: 14px; color: var(--text3); line-height: 1.5; }
+        /* ─═══ Animations ═══─ */
+        @keyframes bgShift {
+            0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
+        }
+        @keyframes pulse-dot {
+            0%,100%{opacity:1} 50%{opacity:.5}
+        }
+        @keyframes fadeIn {
+            from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)}
+        }
+        .animate { animation: fadeIn .3s ease; }
+        /* ─═══ Scrollbar ═══─ */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 99px; }
+        ::selection { background: var(--primary); color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        {% block header %}
+        <div class="header">
+            {% if request.path != '/' %}
+            <a href="javascript:history.back()" class="back-btn">←</a>
+            {% endif %}
+            <div class="z-badge">Z</div>
+            <h1>ZChat</h1>
+            {% if user.is_authenticated %}
+            <a href="{% url 'settings_page' %}" class="icon-btn">⚙️</a>
+            <form method="post" action="{% url 'logout' %}" style="margin:0;display:flex">
+                {% csrf_token %}
+                <button type="submit" class="icon-btn" title="Баромад">↪</button>
+            </form>
+            {% endif %}
+        </div>
+        {% endblock %}
+
+        <div class="content">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+
+        {% if user.is_authenticated %}
+        {% block aibar %}
+        <div class="ai-toggle-bar" id="aiBar">
+            <button class="toggle-switch" id="aiToggle" onclick="toggleAI()">
+                <div class="knob"></div>
+            </button>
+            <div class="ai-status">
+                <span class="status-dot off" id="aiDot"></span>
+                <span class="status-text off" id="aiStatusText">AI қатъ аст</span>
+            </div>
+            <span style="font-size:11px;color:var(--text3);flex-shrink:0" id="aiLabel">ZChat AI</span>
+        </div>
+        {% endblock %}
+        {% endif %}
+    </div>
+
+    {% if user.is_authenticated %}
+    <script>
+        let aiActive = localStorage.getItem('zchat_ai') === 'on';
+
+        function updateAIUI() {
+            const toggle = document.getElementById('aiToggle');
+            const dot = document.getElementById('aiDot');
+            const text = document.getElementById('aiStatusText');
+            const label = document.getElementById('aiLabel');
+
+            if (aiActive) {
+                toggle.classList.add('active');
+                dot.className = 'status-dot on';
+                text.className = 'status-text on';
+                text.textContent = 'AI кор мекунад';
+                label.textContent = '⚡ AI фаъол';
+            } else {
+                toggle.classList.remove('active');
+                dot.className = 'status-dot off';
+                text.className = 'status-text off';
+                text.textContent = 'AI қатъ аст';
+                label.textContent = 'ZChat AI';
+            }
+        }
+
+        function toggleAI() {
+            aiActive = !aiActive;
+            localStorage.setItem('zchat_ai', aiActive ? 'on' : 'off');
+            updateAIUI();
+        }
+
+        updateAIUI();
+    </script>
+    {% endif %}
+</body>
+</html>
